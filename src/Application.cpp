@@ -4,18 +4,28 @@
 #include "MapData.h"
 #include "InputHandler.h"
 #include "UIOverlay.h"
+#include "RiverData.h"
+#include "RiverRenderer.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 #include <iostream>
-// REMOVED: #include "InputHandler.cpp"
 
 static Application* g_app = nullptr;
 
 void Application::framebufferSizeCallback(GLFWwindow*, int w, int h) {
     glViewport(0, 0, w, h);
-    if (g_app) { g_app->m_width = w; g_app->m_height = h; }
+    if (g_app) {
+        g_app->m_width = w;
+        g_app->m_height = h;
+        if (g_app->m_camera) {
+            g_app->m_camera->setAspect(static_cast<float>(w) / static_cast<float>(h));
+        }
+        if (g_app->m_input) {
+            g_app->m_input->updateDimensions(w, h);
+        }
+    }
 }
 
 void Application::mouseButtonCallback(GLFWwindow*, int btn, int action, int mods) {
@@ -58,6 +68,7 @@ void Application::initGLFW() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);  // Allow resizing
 
     m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
     if (!m_window) { glfwTerminate(); throw std::runtime_error("Failed to create GLFW window"); }
@@ -65,11 +76,23 @@ void Application::initGLFW() {
     glfwMakeContextCurrent(m_window);
     glfwSwapInterval(1);
 
+    // Set up callbacks
     glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
     glfwSetMouseButtonCallback(m_window, mouseButtonCallback);
     glfwSetCursorPosCallback(m_window, cursorPosCallback);
     glfwSetScrollCallback(m_window, scrollCallback);
     glfwSetKeyCallback(m_window, keyCallback);
+
+    // Set up window resize callback for ImGui
+    glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int w, int h) {
+        if (g_app) {
+            g_app->m_width = w;
+            g_app->m_height = h;
+            if (g_app->m_camera) {
+                g_app->m_camera->setAspect(static_cast<float>(w) / static_cast<float>(h));
+            }
+        }
+        });
 }
 
 void Application::initGLAD() {
@@ -91,6 +114,8 @@ void Application::initGLAD() {
 void Application::initSystems() {
     m_mapData = std::make_unique<MapData>("data/bangladesh_districts.geojson");
     m_camera = std::make_unique<Camera>(m_width, m_height);
+    m_riverData = std::make_unique<RiverData>("data/riverl_bgd (1).json");
+    m_riverRenderer = std::make_unique<RiverRenderer>(*m_riverData);
 
     // Set better initial camera position
     m_camera->setPosition(glm::vec3(0.0f, 12.0f, 22.0f));
@@ -146,4 +171,5 @@ void Application::render() {
 
     m_renderer->draw(*m_camera, m_totalTime);
     m_ui->draw(*m_mapData, *m_camera, m_width, m_height);
+    m_riverRenderer->draw(*m_camera, m_totalTime);
 }

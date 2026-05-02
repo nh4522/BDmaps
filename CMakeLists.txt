@@ -1,4 +1,5 @@
-﻿cmake_minimum_required(VERSION 3.18)
+﻿# CMakeLists.txt for BDmaps project
+cmake_minimum_required(VERSION 3.18)
 project(BDmaps CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -52,6 +53,7 @@ target_link_libraries(imgui PUBLIC
     OpenGL::GL
 )
 
+# Main source files
 set(SOURCES
     src/main.cpp
     src/Application.cpp
@@ -61,12 +63,27 @@ set(SOURCES
     src/Renderer.cpp
     src/InputHandler.cpp
     src/UIOverlay.cpp
+    src/RiverData.cpp      # River data loading
+    src/RiverRenderer.cpp  # River rendering
 )
 
-add_executable(BDmaps ${SOURCES})
+# Header files
+set(HEADERS
+    include/Application.h
+    include/Camera.h
+    include/MapData.h
+    include/Shader.h
+    include/Renderer.h
+    include/InputHandler.h
+    include/UIOverlay.h
+    include/RiverData.h      # River data header
+    include/RiverRenderer.h  # River renderer header
+)
+
+add_executable(BDmaps ${SOURCES} ${HEADERS})
 
 target_include_directories(BDmaps PRIVATE 
-    include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${imgui_SOURCE_DIR}
     ${imgui_SOURCE_DIR}/backends
 )
@@ -77,7 +94,7 @@ target_link_libraries(BDmaps PRIVATE
     glad::glad
     nlohmann_json::nlohmann_json
     OpenGL::GL
-    imgui  # Link the imgui library
+    imgui
 )
 
 # Add compile definitions for the main executable
@@ -86,6 +103,7 @@ target_compile_definitions(BDmaps PRIVATE
     _CRT_SECURE_NO_WARNINGS
 )
 
+# Copy shaders and data to build directory
 add_custom_command(TARGET BDmaps POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/shaders $<TARGET_FILE_DIR:BDmaps>/shaders

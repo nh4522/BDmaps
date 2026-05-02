@@ -16,13 +16,20 @@ void Camera::orbit(float dYaw, float dPitch) {
 }
 
 void Camera::pan(float dx, float dy) {
+    // Get camera right and up vectors in world space
     glm::vec3 forward = glm::normalize(m_target - m_position);
     glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0, 1, 0)));
-    glm::vec3 up = glm::cross(right, forward);
+    glm::vec3 up = glm::normalize(glm::cross(right, forward));
+
+    // Calculate pan speed based on distance
     float speed = m_dist * 0.002f;
+
+    // Move target and position
+    // dy is negated so moving mouse UP pans UP (not down)
     m_target -= right * dx * speed;
-    m_target += up * dy * speed;
+    m_target += up * (-dy) * speed;
     m_targetGoal = m_target;
+
     recalcPosition();
 }
 
@@ -36,7 +43,7 @@ void Camera::focusOn(glm::vec3 target, float distance) {
 }
 
 void Camera::update(float dt) {
-    float t = 1.0f - std::exp(-8.0f * dt); // smooth exponential lerp
+    float t = 1.0f - std::exp(-8.0f * dt);
     m_dist = m_dist + (m_distGoal - m_dist) * t;
     m_target = m_target + (m_targetGoal - m_target) * t;
     recalcPosition();
@@ -59,6 +66,3 @@ glm::mat4 Camera::getView() const {
 glm::mat4 Camera::getProjection() const {
     return glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
 }
-
-// DO NOT add setPosition or setTarget implementations here!
-// They are already defined inline in Camera.h

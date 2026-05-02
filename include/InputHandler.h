@@ -17,6 +17,10 @@ public:
 
     // Add this method declaration
     void selectDistrict(int idx);
+    void updateDimensions(int width, int height) {
+        m_width = width;
+        m_height = height;
+    }
 
 private:
     glm::vec3 raycastToGroundPlane(double mx, double my);

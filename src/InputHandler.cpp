@@ -88,6 +88,9 @@ void InputHandler::onKey(int key, int, int action, int) {
 void InputHandler::update(float) {}
 
 void InputHandler::doRaycasting(double mx, double my) {
+    // Get current window size from camera aspect ratio
+    // Use m_width and m_height that are updated on resize
+
     float ndcX = (2.0f * (float)mx / m_width) - 1.0f;
     float ndcY = 1.0f - (2.0f * (float)my / m_height);
 
@@ -123,16 +126,16 @@ void InputHandler::doRaycasting(double mx, double my) {
 
     if (bestIdx >= 0 && bestIdx != oldHover) {
         auto& d = m_mapData.districts()[bestIdx];
-        std::cout << "📍 Hover: " << d.name << " (" << d.division << ")" << std::endl;
+        // Optional: Uncomment for debugging
+        // std::cout << "📍 Hover: " << d.name << std::endl;
     }
 }
 
-// Implementation of selectDistrict
 void InputHandler::selectDistrict(int idx) {
     if (idx >= 0 && idx < (int)m_mapData.districts().size()) {
         m_mapData.setSelected(idx);
         auto& d = m_mapData.districts()[idx];
-        std::cout << "\n🔍 SEARCH SELECTED: " << d.name << " (" << d.division << ")" << std::endl;
+        std::cout << "\n🔍 Selected: " << d.name << " (" << d.division << ")" << std::endl;
         m_camera.focusOn(glm::vec3(d.centroid.x, 0.f, d.centroid.y), 8.0f);
     }
 }

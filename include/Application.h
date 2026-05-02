@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <memory>
+class RiverData;
+class RiverRenderer;
 
 class Camera;
 class Renderer;
@@ -43,4 +45,6 @@ private:
     std::unique_ptr<MapData>     m_mapData;
     std::unique_ptr<InputHandler> m_input;
     std::unique_ptr<UIOverlay>   m_ui;        // Make sure this line exists
+    std::unique_ptr<RiverData> m_riverData;
+    std::unique_ptr<RiverRenderer> m_riverRenderer;
 };
