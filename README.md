@@ -65,7 +65,7 @@ Explore 64 districts, 8 divisions, and dynamic level‑of‑detail rendering in 
 ### Clone & Build
 
 ```bash
-git clone https://github.com/DevCraftters/BDmaps.git
+git clone https://github.com/nh4522/BDmaps.git
 cd BDmaps
 cmake --preset x64-debug
 cmake --build out/build/x64-debug
