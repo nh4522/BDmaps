@@ -25,6 +25,16 @@ Explore 64 districts, 8 divisions, and dynamic level‑of‑detail rendering in 
 
 
 ---
+## Animated view
+### The basic rendering view
+![Demo](pics/demo1.gif) 
+### The dropdown sections
+![Demo](pics/demo2.gif) 
+### The search section
+![Demo](pics/demo3.gif) 
+
+
+---
 
 ## ✨ Features
 
